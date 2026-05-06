@@ -78,8 +78,33 @@ from django.db.models import Count
 from django.db.models.functions import Trunc
 from .serializer import StatisticsListSerializer
 
+
 ##统计每天采集人数接口
 class StatisticsView(GenericViewSet, ListModelMixin):
     queryset = Collection.objects.annotate(date=Trunc('create_time', 'day')).values('date').annotate(
         count=Count('id')).values('date', 'count')
     serializer_class = StatisticsListSerializer
+
+
+from libs.baidu_ai import BaiDuFace
+
+
+# 人脸检测接口 post请求
+class FaceView(GenericViewSet):
+    def create(self, request, *args, **kwargs):
+        # 1 取出前端传入的人脸照片
+        avatar_object = request.data.get('avatar')
+        if not avatar_object:
+            return Response({'code': 103, 'msg': '请正常提交人脸'})
+        # 使用百度
+        ai = BaiDuFace()
+        res = ai.search_user(avatar_object)
+        if res.get("error_code") == 0:
+            # 查到了，取出userid-->能匹配多个，取第一条
+            user_id = res.get('result').get('user_list')[0].get('user_id')
+            score = int(res.get('result').get('user_list')[0].get('score'))
+            # 根据采集库内查出用户详情
+            user = Collection.objects.filter(name_pinyin=user_id).first()
+            return Response({'code': 100, 'msg': '匹配成功', 'name': user.name, 'score': score})
+        else:
+            return Response({'code': 101, 'msg': '匹配失败'})

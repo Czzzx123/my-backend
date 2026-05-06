@@ -61,10 +61,8 @@ class AreaSerializer(serializers.ModelSerializer):
         model = Area
         fields = ['id', 'name', 'desc']
 
+
 # 采集统计接口 get请求
 class StatisticsListSerializer(serializers.Serializer):
     date = serializers.DateTimeField(format='%Y年%m月%d日')
     count = serializers.IntegerField()
-
-
-#人脸检测接口 post请求
