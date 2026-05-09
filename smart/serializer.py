@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.exceptions import APIException
 
-from .models import Banner, Notice, Collection, Area
+from .models import Banner, Notice, Collection, Area, Activity
 from libs.baidu_ai import BaiDuFace
 
 
@@ -16,7 +16,11 @@ class BannerSerializer(serializers.ModelSerializer):
 class NoticeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notice
-        fields = ['id', 'title', 'content']
+        fields = ['id', 'title', 'img', 'create_time', 'content']
+        # create_time 只想要年月日，不要时分秒
+        extra_kwargs = {
+            'create_time': {'format': '%Y-%m-%d'}
+        }
 
 
 class CollectionSerializer(serializers.ModelSerializer):
@@ -66,3 +70,13 @@ class AreaSerializer(serializers.ModelSerializer):
 class StatisticsListSerializer(serializers.Serializer):
     date = serializers.DateTimeField(format='%Y年%m月%d日')
     count = serializers.IntegerField()
+
+
+# 活动序列化类
+class ActivitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Activity
+        fields = ['id', 'title', 'text', 'date', 'count', 'score', 'total_count']
+        extra_kwargs = {
+            'date': {'format': '%Y-%m-%d'}
+        }

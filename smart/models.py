@@ -83,8 +83,44 @@ class UserInfo(models.Model):
     create_date = models.DateTimeField(verbose_name='日期', auto_now_add=True)
     score = models.IntegerField(verbose_name='积分', default=0)
 
+    # 用户需要用手机号登录
+    mobile = models.CharField(max_length=11, null=True, verbose_name='手机号')
+
     class Meta:
         verbose_name_plural = '用户表'
 
     def __str__(self):
         return self.name
+
+
+# 活动表
+class Activity(models.Model):
+    title = models.CharField(verbose_name="活动标题", max_length=128)
+    text = models.TextField(verbose_name="活动描述", null=True, blank=True)
+    date = models.DateField(verbose_name="活动举办时间")
+    count = models.IntegerField(verbose_name="报名人数", default=0)
+    total_count = models.IntegerField(verbose_name="总人数", default=0)
+    score = models.IntegerField(verbose_name="积分", default=0)
+    join_record = models.ManyToManyField(verbose_name="参与者", through="JoinRecord",
+                                         through_fields=("activity", "user"), to="UserInfo")
+
+    class Meta:
+        verbose_name_plural = "活动表"
+
+    def __str__(self):
+        return self.title
+
+
+# 活动报名记录表--》用户多对多报名
+class JoinRecord(models.Model):
+    user = models.ForeignKey(verbose_name='用户', to='UserInfo', on_delete=models.CASCADE)
+    activity = models.ForeignKey(verbose_name='活动', to='Activity', on_delete=models.CASCADE, related_name='ac')
+
+    exchange = models.BooleanField(verbose_name='是否已兑换', default=False)
+
+    class Meta:
+        verbose_name_plural = '活动记录表'
+
+    def __str__(self):
+        # 假设你的UserInfo模型也写了__str__返回用户名
+        return f"{self.user} - {self.activity.title}"

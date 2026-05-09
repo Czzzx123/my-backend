@@ -1,4 +1,5 @@
 from aip import AipFace
+from aip import AipSpeech
 
 import base64
 
@@ -45,9 +46,25 @@ class BaiDuFace:
         return res
 
 
+# 语音识别
+
+class BaiDuVoice:
+    def __init__(self, APP_ID='123155212', API_KEY='AUs37F3NykDhGNKquZo50bEH',
+                 SECRET_KEY='GgIDozI1fDPVTaaKbTUn6ercE28iTc7F'):
+        self.APP_ID = APP_ID
+        self.API_KEY = API_KEY
+        self.SECRET_KEY = SECRET_KEY
+        self.client = AipSpeech(self.APP_ID, self.API_KEY, self.SECRET_KEY)
+
+    def speech(self, voice_object):
+        res = self.client.asr(voice_object.read(), 'pcm', 16000, {
+            'dev_pid': 1537,
+        })
+        return res
+
+
 if __name__ == '__main__':
     ai = BaiDuFace()
     # res = ai.add_user()
     res = ai.delete_user()
     print(res)
-

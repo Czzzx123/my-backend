@@ -1,5 +1,5 @@
-
 from aip import AipFace
+from aip import AipSpeech
 
 import base64
 
@@ -50,9 +50,23 @@ class BaiDuFace:
         res = self.client.search(image, imageType, groupIdList);
         return res
 
-
-# 人名转拼英
+    # 人名转拼英
     def name_to_pinyin(self, text):
         style = Style.TONE3
-        name_list = lazy_pinyin(text,style=style)
+        name_list = lazy_pinyin(text, style=style)
         return "".join(name_list)
+
+
+class BaiDuVoice:
+    def __init__(self, APP_ID='123155212', API_KEY='AUs37F3NykDhGNKquZo50bEH',
+                 SECRET_KEY='GgIDozI1fDPVTaaKbTUn6ercE28iTc7F'):
+        self.APP_ID = APP_ID
+        self.API_KEY = API_KEY
+        self.SECRET_KEY = SECRET_KEY
+        self.client = AipSpeech(self.APP_ID, self.API_KEY, self.SECRET_KEY)
+
+    def speech(self, voice_object):
+        res = self.client.asr(voice_object.read(), 'pcm', 16000, {
+            'dev_pid': 1537,
+        })
+        return res
